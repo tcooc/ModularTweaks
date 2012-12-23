@@ -1,5 +1,7 @@
 package tco.modulartweaks;
 
+import net.minecraftforge.common.Configuration;
+
 import org.objectweb.asm.util.ASMifier;
 
 import com.google.common.eventbus.EventBus;
@@ -34,14 +36,15 @@ public class ModularTweaksModContainer extends DummyModContainer {
 	
 	@Subscribe
 	public void preInit(FMLPreInitializationEvent event) {
-		ModularTweaks.logger.info("Loading tweaks: ");
-		proxy.init();
-		ModularTweaks.logger.info("Done loading tweaks.");
-
+		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
+		ModularTweaks.loadConfigs(config);
 	}
 	
 	@Subscribe
 	public void init(FMLInitializationEvent event) {
+		ModularTweaks.logger.info("Loading tweaks: ");
+		proxy.init();
+		ModularTweaks.logger.info("Done loading tweaks.");
 		try {
 			ASMifier.main(new String[]{"-debug", "tco.modulartweaks.TestModule"});
 		} catch (Exception e) {

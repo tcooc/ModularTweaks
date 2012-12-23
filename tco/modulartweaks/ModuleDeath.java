@@ -1,12 +1,13 @@
 package tco.modulartweaks;
 
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 
-public class ModuleDeath implements Module {
+public class ModuleDeath implements IModule {
 	@Override
 	public void initialize() {
 		MinecraftForge.EVENT_BUS.register(this);
@@ -31,5 +32,20 @@ public class ModuleDeath implements Module {
 	@Override
 	public String getName() {
 		return "Death";
+	}
+
+	@Override
+	public String getDescription() {
+		return "Player death tweaks";
+	}
+
+	@Override
+	public void loadConfigs(Configuration config) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void transform(ModularTweaksTransformer transformer, String name) {
 	}
 }

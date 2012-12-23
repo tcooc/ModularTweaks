@@ -1,14 +1,25 @@
 package tco.modulartweaks;
 
+import java.lang.reflect.Method;
 import java.util.List;
+
+import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
+import org.objectweb.asm.tree.ClassNode;
+import org.objectweb.asm.tree.InsnList;
+import org.objectweb.asm.tree.InsnNode;
+import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
+import org.objectweb.asm.tree.VarInsnNode;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 
-public class ModuleTreeGravity implements Module {
+public class ModuleTreeGravity implements IModule {
 	@Override
 	public void initialize() {
 		MinecraftForge.EVENT_BUS.register(this);
@@ -17,6 +28,15 @@ public class ModuleTreeGravity implements Module {
 	@Override
 	public String getName() {
 		return "Tree Gravity";
+	}
+
+	@Override
+	public String getDescription() {
+		return "Trees fall.";
+	}
+
+	@Override
+	public void loadConfigs(Configuration config) {		
 	}
 
 	public static void onWoodBreak(World world, int x, int y,
@@ -85,5 +105,33 @@ public class ModuleTreeGravity implements Module {
 
 	private static boolean isWood(World world, int x, int y, int z, int id) {
 		return world.getBlockId(x, y, z) == id;
+	}
+
+	@Override
+	public void transform(ModularTweaksTransformer trans, String name) {
+		try{
+			if(ObfuscationHelper.checkBoth("net.minecraft.block.BlockLog", name)) {
+				trans.startTransform();
+				/* Insert
+				 * ModuleTreeGravity.onWoodBreak(world, x, y, z, i ,m);
+				 */
+				MethodNode method = trans.findMethod("breakBlock", Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(World.class), Type.INT_TYPE, Type.INT_TYPE, Type.INT_TYPE, Type.INT_TYPE, Type.INT_TYPE));
+				InsnList insn = new InsnList();
+				insn.add(new VarInsnNode(Opcodes.ALOAD, 1));
+				insn.add(new VarInsnNode(Opcodes.ILOAD, 2));
+				insn.add(new VarInsnNode(Opcodes.ILOAD, 3));
+				insn.add(new VarInsnNode(Opcodes.ILOAD, 4));
+				insn.add(new VarInsnNode(Opcodes.ILOAD, 5));
+				//insn.add(new VarInsnNode(Opcodes.ILOAD, 6));
+				insn.add(new InsnNode(Opcodes.ICONST_0)); //FIXME meta
+				Method reflMethod = ModuleTreeGravity.class.getDeclaredMethod("onWoodBreak", World.class, Integer.TYPE, Integer.TYPE, Integer.TYPE, Integer.TYPE, Integer.TYPE);
+				insn.add(new MethodInsnNode(Opcodes.INVOKESTATIC, ModuleTreeGravity.class.getCanonicalName().replaceAll("\\.", "/"),
+						reflMethod.getName(), Type.getMethodDescriptor(reflMethod)));
+				method.instructions.insert(insn);
+				trans.stopTransform(); //*/
+			}
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 	}
 }

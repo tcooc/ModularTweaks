@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import net.minecraftforge.common.Configuration;
+
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.IFMLCallHook;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
@@ -33,9 +35,33 @@ public class ModularTweaks implements IFMLLoadingPlugin, IFMLCallHook {
 		}
 	}
 
-	public static final List<Module> clientModules = new LinkedList<Module>();
-	public static final List<Module> serverModules = new LinkedList<Module>();
-	public static final Map<String, Integer> masterConfig = new HashMap<String, Integer>();
+	public static final List<IModule> clientModules = new LinkedList<IModule>();
+	public static final List<IModule> serverModules = new LinkedList<IModule>();
+
+	public static void loadConfigs(Configuration config) {
+		config.load();
+		List<IModule> toRemove = new LinkedList<IModule>();
+		for(IModule module : clientModules) {
+			boolean enabled = config.get("Modules", module.getName(), false, module.getDescription()).getBoolean(false);
+			//if(enabled) {
+				module.loadConfigs(config);
+			//} else {
+				//toRemove.add(module); //TODO DEBUG
+			//}
+		}
+		clientModules.removeAll(toRemove);
+		toRemove.clear();
+		for(IModule module : serverModules) {
+			boolean enabled = config.get("Modules", module.getName(), false, module.getDescription()).getBoolean(false);
+			//if(enabled) {
+				module.loadConfigs(config);
+			//} else {
+				//toRemove.add(module); //TODO DEBUG
+			//}
+		}
+		serverModules.removeAll(toRemove);
+		config.save();
+	}
 
 
 	static{

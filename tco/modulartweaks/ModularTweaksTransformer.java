@@ -30,9 +30,14 @@ public class ModularTweaksTransformer implements IClassTransformer {
 		//load configs here...
 	}
 
+	private byte[] bytecode;
 	private ClassReader classReader;
 	private ClassWriter classWriter;
 	private ClassNode classNode;
+
+	public ClassNode getClassNode() {
+		return classNode;
+	}
 
 	//iconst_0	03 : 0
 	//iconst_1	04 : 1
@@ -47,64 +52,14 @@ public class ModularTweaksTransformer implements IClassTransformer {
 	@Override
 	public byte[] transform(String name, byte[] bytes) {
 		if(name.startsWith("tco")) return bytes; //idk why this happens :/
+		bytecode = bytes;
 		classWriter = null;
 		try {
-			if(ObfuscationHelper.checkBoth("net.minecraft.block.BlockGlass", name)) {
-				ModularTweaks.logger.info("Injecting BlockGlass edits");
-				//Strong Glass
-				startTransform(bytes);
-				MethodNode method = findMethod(classNode, "quantityDropped", Type.getMethodDescriptor(Type.INT_TYPE, Type.getType(Random.class)));
-				if(method != null) {
-					InsnList insn = new InsnList();
-					insn.add(new VarInsnNode(Opcodes.ALOAD, 1));
-					Method reflMethod = ModuleStrongGlass.class.getDeclaredMethod("onGlassBreak", Random.class);
-					insn.add(new MethodInsnNode(Opcodes.INVOKESTATIC, ModuleStrongGlass.class.getCanonicalName().replaceAll("\\.", "/"),
-							reflMethod.getName(), Type.getMethodDescriptor(reflMethod)));
-					insn.add(new InsnNode(Opcodes.IRETURN));
-					method.instructions = insn;
-				}
-				stopTransform();
-			} else if(ObfuscationHelper.checkBoth("net.minecraft.block.BlockCactus", name)) {
-				ModularTweaks.logger.info("Injecting BlockCactus changes.");
-				//Cactus Proof
-				startTransform(bytes);
-				MethodNode method = findMethod(classNode, "onEntityCollidedWithBlock", Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(World.class), Type.INT_TYPE, Type.INT_TYPE, Type.INT_TYPE, Type.getType(Entity.class)));
-				if(method != null) {
-					printMethod(method);
-					InsnList insn = method.instructions;
-					InsnList insert = new InsnList();
-					LabelNode label = new LabelNode();
-					insert.add(new VarInsnNode(Opcodes.ALOAD, 5));
-					insert.add(new TypeInsnNode(Opcodes.INSTANCEOF, EntityItem.class.getCanonicalName().replaceAll("\\.", "/")));
-					//insert.add(new VarInsnNode(Opcodes.ALOAD, 5));
-					insert.add(new JumpInsnNode(Opcodes.IFEQ, label));
-					insert.add(new InsnNode(Opcodes.RETURN));
-					insert.add(label);
-					//insert.add(new FrameNode());
-					//insert.add(new VarInsnNode(Opcodes.ALOAD, 5));
-					insn.insert(insert);
-				}
-				stopTransform();
-			} else if(ObfuscationHelper.checkBoth("net.minecraft.block.BlockLog", name)) {
-				ModularTweaks.logger.info("BlockLog");
-				//Tree Gravity
-				startTransform(bytes);
-				MethodNode method = findMethod(classNode, "breakBlock", Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(World.class), Type.INT_TYPE, Type.INT_TYPE, Type.INT_TYPE, Type.INT_TYPE, Type.INT_TYPE));
-				if(method != null) {
-					InsnList insn = new InsnList();
-					insn.add(new VarInsnNode(Opcodes.ALOAD, 1));
-					insn.add(new VarInsnNode(Opcodes.ILOAD, 2));
-					insn.add(new VarInsnNode(Opcodes.ILOAD, 3));
-					insn.add(new VarInsnNode(Opcodes.ILOAD, 4));
-					insn.add(new VarInsnNode(Opcodes.ILOAD, 5));
-					insn.add(new VarInsnNode(Opcodes.ILOAD, 6));
-					Method reflMethod = ModuleTreeGravity.class.getDeclaredMethod("onWoodBreak", World.class, Integer.TYPE, Integer.TYPE, Integer.TYPE, Integer.TYPE, Integer.TYPE);
-					insn.add(new MethodInsnNode(Opcodes.INVOKESTATIC, ModuleTreeGravity.class.getCanonicalName().replaceAll("\\.", "/"),
-							reflMethod.getName(), Type.getMethodDescriptor(reflMethod)));
-					insn.add(new InsnNode(Opcodes.RETURN));
-					method.instructions.insert(insn);
-				}
-				stopTransform(); //*/
+			for(IModule module : ModularTweaks.clientModules) {
+				module.transform(this, name);
+			}
+			for(IModule module : ModularTweaks.serverModules) {
+				module.transform(this, name);
 			}
 		} catch(Exception e) {
 			e.printStackTrace();
@@ -116,18 +71,18 @@ public class ModularTweaksTransformer implements IClassTransformer {
 		return bytes;
 	}
 
-	private void startTransform(byte[] bytes) {
+	public void startTransform() {
 		classNode = new ClassNode();
-		classReader = new ClassReader(bytes);
+		classReader = new ClassReader(bytecode);
 		classReader.accept(classNode, 0);
 	}
 
-	private void stopTransform() {
+	public void stopTransform() {
 		classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 		classNode.accept(classWriter);
 	}
 
-	private static MethodNode findMethod(ClassNode classNode, String name, String desc) {
+	public MethodNode findMethod(String name, String desc) {
 		for(MethodNode method : (List<MethodNode>) classNode.methods) {
 			if(ObfuscationHelper.checkBoth(name, method.name) && desc.equals(method.desc)) {
 				return method;

@@ -4,7 +4,7 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public void init() {
 		super.init();
-		for(Module mod : ModularTweaks.clientModules) {
+		for(IModule mod : ModularTweaks.clientModules) {
 			ModularTweaks.logger.info(mod.getName());
 			mod.initialize();
 		}

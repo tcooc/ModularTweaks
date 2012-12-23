@@ -11,13 +11,14 @@ import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.BlockTrapDoor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;
+import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import cpw.mods.fml.client.FMLClientHandler;
 
-public class ModuleDoubleDoors implements Module {
+public class ModuleDoubleDoors implements IModule {
 	private static final ForgeDirection[] SIDES = { NORTH, EAST, SOUTH, WEST };
 	private BlockDoor door;
 	private BlockFenceGate gate;
@@ -36,6 +37,15 @@ public class ModuleDoubleDoors implements Module {
 	@Override
 	public String getName() {
 		return "Double Doors";
+	}
+	
+	@Override
+	public String getDescription() {
+		return "Client only; Opening 1 door opens adjacent doors. Also works for fence gates and trapdoors.";
+	}
+
+	@Override
+	public void loadConfigs(Configuration config) {
 	}
 
 	@ForgeSubscribe
@@ -96,6 +106,10 @@ public class ModuleDoubleDoors implements Module {
 
 	private boolean trapdoorOpen(World world, int x, int y, int z) {
 		return BlockTrapDoor.isTrapdoorOpen(world.getBlockMetadata(x, y, z));
+	}
+
+	@Override
+	public void transform(ModularTweaksTransformer transformer, String name) {
 	}
 
 }
