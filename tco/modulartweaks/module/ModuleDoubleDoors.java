@@ -24,6 +24,8 @@ public class ModuleDoubleDoors implements IModule {
 	private BlockDoor door;
 	private BlockFenceGate gate;
 	private BlockTrapDoor trapdoor;
+	private boolean enableDoor = true, enableGate = true, enableTrapdoor = true;
+	
 	private Minecraft client;
 
 	@Override
@@ -47,6 +49,12 @@ public class ModuleDoubleDoors implements IModule {
 
 	@Override
 	public void loadConfigs(Configuration config) {
+			enableDoor = config.get(getName(), "enableDoor", enableDoor,
+				"Double doors").getBoolean(enableDoor);
+			enableGate = config.get(getName(), "enableGate", enableGate,
+				"Double gates").getBoolean(enableGate);
+			enableTrapdoor = config.get(getName(), "enableTrapdoor", enableTrapdoor,
+				"Double trapdoors").getBoolean(enableTrapdoor);
 	}
 
 	@ForgeSubscribe
@@ -54,7 +62,7 @@ public class ModuleDoubleDoors implements IModule {
 		if(!event.entity.worldObj.isRemote) return;
 		if(event.action == PlayerInteractEvent.Action.RIGHT_CLICK_BLOCK) {
 			World world = event.entity.worldObj;
-			if(isBlock(event, UNKNOWN, door)) {
+			if(enableDoor && isBlock(event, UNKNOWN, door)) {
 				boolean open = !doorOpen(world, event.x, event.y, event.z);
 				for(ForgeDirection dir : SIDES) {
 					if(isBlock(event, dir, door)) {
@@ -66,7 +74,7 @@ public class ModuleDoubleDoors implements IModule {
 			} else if(isBlock(event, UNKNOWN, gate)) {
 				boolean open = !gateOpen(world, event.x, event.y, event.z);
 				for(ForgeDirection dir : SIDES) {
-					if(isBlock(event, dir, gate)) {
+					if(enableGate && isBlock(event, dir, gate)) {
 						int x = event.x + dir.offsetX, y = event.y + dir.offsetY, z = event.z + dir.offsetZ;
 						boolean isOpen = gateOpen(world, x, y, z);
 						updateState(event, x, y, z, open, isOpen);
@@ -75,7 +83,7 @@ public class ModuleDoubleDoors implements IModule {
 			} else if(isBlock(event, UNKNOWN, trapdoor)) {
 				boolean open = !trapdoorOpen(world, event.x, event.y, event.z);
 				for(ForgeDirection dir : SIDES) {
-					if(isBlock(event, dir, trapdoor)) {
+					if(enableTrapdoor && isBlock(event, dir, trapdoor)) {
 						int x = event.x + dir.offsetX, y = event.y + dir.offsetY, z = event.z + dir.offsetZ;
 						boolean isOpen = trapdoorOpen(world, x, y, z);
 						updateState(event, x, y, z, open, isOpen);

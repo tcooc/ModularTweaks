@@ -21,9 +21,13 @@ import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 
 public class ModuleTreeGravity implements IModule {
+
+	private static boolean disabled = true;
+
 	@Override
 	public void initialize() {
-		MinecraftForge.EVENT_BUS.register(this);
+		//MinecraftForge.EVENT_BUS.register(this);
+		disabled = false;
 	}
 
 	@Override
@@ -42,6 +46,7 @@ public class ModuleTreeGravity implements IModule {
 
 	public static void onWoodBreak(World world, int x, int y,
 			int z, int id, int meta) {
+		if(disabled) return;
 		if(isWood(world, x + 1, y, z, id)) {
 			breakBlock(world, x + 1, y, z);
 		}

@@ -35,7 +35,7 @@ public class ModuleCactusProof implements IModule {
 
 	@Override
 	public String getDescription() {
-		return "Enable to stop cactus from destroying items.";
+		return "Stops cactus from destroying items.";
 	}
 
 	@Override
