@@ -1,4 +1,4 @@
-package tco.modulartweaks;
+package tco.modulartweaks.module;
 
 import java.lang.reflect.Method;
 import java.util.Random;
@@ -10,6 +10,9 @@ import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
+
+import tco.modulartweaks.ModularTweaksTransformer;
+import tco.modulartweaks.ObfuscationDecoder;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockPane;
@@ -26,7 +29,7 @@ public class ModuleStrongGlass implements IModule {
 		if(dropPane) {
 			ObfuscationReflectionHelper.setPrivateValue(
 					BlockPane.class, (BlockPane) Block.thinGlass, true,
-					"canDropItself", ObfuscationHelper.get("canDropItself"));
+					"canDropItself", ObfuscationDecoder.get("canDropItself"));
 		}
 	}
 
@@ -55,7 +58,7 @@ public class ModuleStrongGlass implements IModule {
 	@Override
 	public void transform(ModularTweaksTransformer trans, String name) {
 		try {
-			if(ObfuscationHelper.checkBoth("net.minecraft.block.BlockGlass", name)) {
+			if(ObfuscationDecoder.checkBoth("net.minecraft.block.BlockGlass", name)) {
 				trans.startTransform();
 				MethodNode method = trans.findMethod("quantityDropped", Type.getMethodDescriptor(Type.INT_TYPE, Type.getType(Random.class)));
 				InsnList insn = new InsnList();

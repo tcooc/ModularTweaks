@@ -5,7 +5,7 @@ import java.util.Map;
 
 import net.minecraft.block.Block;
 
-public class ObfuscationHelper {
+public class ObfuscationDecoder {
 	private static final Map<String, String> obf = new HashMap<String, String>();
 
 	public static String get(String key) {

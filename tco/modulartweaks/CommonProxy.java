@@ -1,5 +1,7 @@
 package tco.modulartweaks;
 
+import tco.modulartweaks.module.IModule;
+
 public class CommonProxy {
 	public void init() {
 		for(IModule mod : ModularTweaks.instance.commonModules) {

@@ -5,13 +5,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import tco.modulartweaks.module.IModule;
+import tco.modulartweaks.module.ModuleCactusProof;
+import tco.modulartweaks.module.ModuleCheckId;
+import tco.modulartweaks.module.ModuleDeath;
+import tco.modulartweaks.module.ModuleDoubleDoors;
+import tco.modulartweaks.module.ModuleSignEdit;
+import tco.modulartweaks.module.ModuleStack;
+import tco.modulartweaks.module.ModuleStrongGlass;
+import tco.modulartweaks.module.ModuleTreeGravity;
+
 import net.minecraftforge.common.Configuration;
 
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.IFMLCallHook;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
-import cpw.mods.fml.relauncher.ILibrarySet;
 
 //explosion drop rate
 //lava flows like water, infinite lava
@@ -20,7 +29,7 @@ import cpw.mods.fml.relauncher.ILibrarySet;
 //endermen
 //double door rs
 @TransformerExclusions(value={"tco.modulartweaks"})
-public class ModularTweaks implements IFMLLoadingPlugin {
+public class ModularTweaks implements IFMLLoadingPlugin, IFMLCallHook {
 	public static final String ID = "ModularTweaks";
 	public static final String VERSION = "1.0";
 
@@ -34,7 +43,7 @@ public class ModularTweaks implements IFMLLoadingPlugin {
 			logger.setParent(FMLLog.getLogger());
 		}
 	}
-	
+
 	public void initialize() {
 		clientModules.add(new ModuleDoubleDoors());
 		commonModules.add(new ModuleCactusProof());
@@ -54,11 +63,11 @@ public class ModularTweaks implements IFMLLoadingPlugin {
 		List<IModule> toRemove = new LinkedList<IModule>();
 		for(IModule module : clientModules) {
 			boolean enabled = config.get("Modules", module.getName(), false, module.getDescription()).getBoolean(false);
-			//if(enabled) {
-			module.loadConfigs(config);
-			//} else {
-			//toRemove.add(module); //TODO DEBUG
-			//}
+			if(enabled) {
+				module.loadConfigs(config);
+			} else {
+				toRemove.add(module); //TODO DEBUG
+			}
 		}
 		clientModules.removeAll(toRemove);
 		toRemove.clear();
@@ -91,11 +100,17 @@ public class ModularTweaks implements IFMLLoadingPlugin {
 
 	@Override
 	public String getSetupClass() {
-		return null;
+		return "tco.modulartweaks.ModularTweaks";
 	}
 
 	@Override
 	public void injectData(Map<String, Object> data) {
+	}
+
+	@Override
+	public Void call() throws Exception {
+		initialize();
+		return null;
 	}
 
 }

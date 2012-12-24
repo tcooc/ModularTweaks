@@ -5,13 +5,11 @@ import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
+
+import tco.modulartweaks.module.IModule;
 import cpw.mods.fml.relauncher.IClassTransformer;
 
 public class ModularTweaksTransformer implements IClassTransformer {
-
-	public ModularTweaksTransformer() {
-		ModularTweaks.instance.initialize();
-	}
 
 	private byte[] bytecode;
 	private ClassReader classReader;
@@ -67,7 +65,7 @@ public class ModularTweaksTransformer implements IClassTransformer {
 
 	public MethodNode findMethod(String name, String desc) {
 		for(MethodNode method : (List<MethodNode>) classNode.methods) {
-			if(ObfuscationHelper.checkBoth(name, method.name) && desc.equals(method.desc)) {
+			if(ObfuscationDecoder.checkBoth(name, method.name) && desc.equals(method.desc)) {
 				return method;
 			}
 		}

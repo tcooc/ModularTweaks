@@ -1,8 +1,10 @@
-package tco.modulartweaks;
+package tco.modulartweaks.module;
 
 import java.util.Arrays;
 import java.util.Map;
 import java.util.TreeMap;
+
+import tco.modulartweaks.ModularTweaksTransformer;
 
 import net.minecraft.item.Item;
 import net.minecraft.util.MathHelper;

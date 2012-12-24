@@ -1,5 +1,6 @@
-package tco.modulartweaks;
+package tco.modulartweaks.module;
 
+import tco.modulartweaks.ModularTweaksTransformer;
 import net.minecraftforge.common.Configuration;
 
 //transform is always called (even if module is disabled)

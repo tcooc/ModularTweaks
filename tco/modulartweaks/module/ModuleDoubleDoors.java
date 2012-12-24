@@ -1,10 +1,11 @@
-package tco.modulartweaks;
+package tco.modulartweaks.module;
 
 import static net.minecraftforge.common.ForgeDirection.EAST;
 import static net.minecraftforge.common.ForgeDirection.NORTH;
 import static net.minecraftforge.common.ForgeDirection.SOUTH;
 import static net.minecraftforge.common.ForgeDirection.UNKNOWN;
 import static net.minecraftforge.common.ForgeDirection.WEST;
+import tco.modulartweaks.ModularTweaksTransformer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.BlockFenceGate;

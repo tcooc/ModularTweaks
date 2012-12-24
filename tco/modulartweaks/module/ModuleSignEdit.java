@@ -1,5 +1,6 @@
-package tco.modulartweaks;
+package tco.modulartweaks.module;
 
+import tco.modulartweaks.ModularTweaksTransformer;
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;

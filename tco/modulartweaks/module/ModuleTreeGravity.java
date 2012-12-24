@@ -1,4 +1,4 @@
-package tco.modulartweaks;
+package tco.modulartweaks.module;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -6,10 +6,12 @@ import java.util.List;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
+
+import tco.modulartweaks.ModularTweaksTransformer;
+import tco.modulartweaks.ObfuscationDecoder;
 
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
@@ -109,7 +111,7 @@ public class ModuleTreeGravity implements IModule {
 	@Override
 	public void transform(ModularTweaksTransformer trans, String name) {
 		try{
-			if(ObfuscationHelper.checkBoth("net.minecraft.block.BlockLog", name)) {
+			if(ObfuscationDecoder.checkBoth("net.minecraft.block.BlockLog", name)) {
 				trans.startTransform();
 				/* Insert
 				 * ModuleTreeGravity.onWoodBreak(world, x, y, z, i ,m);

@@ -2,8 +2,6 @@ package tco.modulartweaks;
 
 import net.minecraftforge.common.Configuration;
 
-import org.objectweb.asm.util.ASMifier;
-
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 

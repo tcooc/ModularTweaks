@@ -1,4 +1,4 @@
-package tco.modulartweaks;
+package tco.modulartweaks.module;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
@@ -10,6 +10,9 @@ import org.objectweb.asm.tree.LabelNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.TypeInsnNode;
 import org.objectweb.asm.tree.VarInsnNode;
+
+import tco.modulartweaks.ModularTweaksTransformer;
+import tco.modulartweaks.ObfuscationDecoder;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -42,7 +45,7 @@ public class ModuleCactusProof implements IModule {
 	//TODO config
 	@Override
 	public void transform(ModularTweaksTransformer trans, String name) {
-		if(ObfuscationHelper.checkBoth("net.minecraft.block.BlockCactus", name)) {
+		if(ObfuscationDecoder.checkBoth("net.minecraft.block.BlockCactus", name)) {
 			trans.startTransform();
 			/* Insert:
 			 * if(entity instanceof EntityItem && ModuleCactusProof.enabled) return;

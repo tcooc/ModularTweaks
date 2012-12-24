@@ -1,5 +1,7 @@
-package tco.modulartweaks;
+package tco.modulartweaks.module;
 
+import tco.modulartweaks.ModularTweaks;
+import tco.modulartweaks.ModularTweaksTransformer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
