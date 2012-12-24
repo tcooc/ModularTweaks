@@ -73,11 +73,11 @@ public class ModularTweaks implements IFMLLoadingPlugin, IFMLCallHook {
 		toRemove.clear();
 		for(IModule module : commonModules) {
 			boolean enabled = config.get("Modules", module.getName(), false, module.getDescription()).getBoolean(false);
-			//if(enabled) {
+			if(enabled) {
 			module.loadConfigs(config);
-			//} else {
-			//toRemove.add(module); //TODO DEBUG
-			//}
+			} else {
+				toRemove.add(module); //TODO DEBUG
+			}
 		}
 		commonModules.removeAll(toRemove);
 		config.save();
