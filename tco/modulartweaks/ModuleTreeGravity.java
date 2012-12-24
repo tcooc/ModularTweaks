@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
-import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -122,8 +121,7 @@ public class ModuleTreeGravity implements IModule {
 				insn.add(new VarInsnNode(Opcodes.ILOAD, 3));
 				insn.add(new VarInsnNode(Opcodes.ILOAD, 4));
 				insn.add(new VarInsnNode(Opcodes.ILOAD, 5));
-				//insn.add(new VarInsnNode(Opcodes.ILOAD, 6));
-				insn.add(new InsnNode(Opcodes.ICONST_0)); //FIXME meta
+				insn.add(new VarInsnNode(Opcodes.ILOAD, 6));
 				Method reflMethod = ModuleTreeGravity.class.getDeclaredMethod("onWoodBreak", World.class, Integer.TYPE, Integer.TYPE, Integer.TYPE, Integer.TYPE, Integer.TYPE);
 				insn.add(new MethodInsnNode(Opcodes.INVOKESTATIC, ModuleTreeGravity.class.getCanonicalName().replaceAll("\\.", "/"),
 						reflMethod.getName(), Type.getMethodDescriptor(reflMethod)));

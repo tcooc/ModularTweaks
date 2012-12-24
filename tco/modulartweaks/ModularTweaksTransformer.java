@@ -1,33 +1,16 @@
 package tco.modulartweaks;
 
-import java.lang.reflect.Method;
 import java.util.List;
-import java.util.Random;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.world.World;
-
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.Opcodes;
-import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.ClassNode;
-import org.objectweb.asm.tree.InsnList;
-import org.objectweb.asm.tree.InsnNode;
-import org.objectweb.asm.tree.JumpInsnNode;
-import org.objectweb.asm.tree.LabelNode;
-import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
-import org.objectweb.asm.tree.TypeInsnNode;
-import org.objectweb.asm.tree.VarInsnNode;
-
 import cpw.mods.fml.relauncher.IClassTransformer;
 
 public class ModularTweaksTransformer implements IClassTransformer {
 
 	public ModularTweaksTransformer() {
-		//load configs here...
+		ModularTweaks.instance.initialize();
 	}
 
 	private byte[] bytecode;
@@ -55,10 +38,10 @@ public class ModularTweaksTransformer implements IClassTransformer {
 		bytecode = bytes;
 		classWriter = null;
 		try {
-			for(IModule module : ModularTweaks.clientModules) {
+			for(IModule module : ModularTweaks.instance.clientModules) {
 				module.transform(this, name);
 			}
-			for(IModule module : ModularTweaks.serverModules) {
+			for(IModule module : ModularTweaks.instance.commonModules) {
 				module.transform(this, name);
 			}
 		} catch(Exception e) {

@@ -25,11 +25,11 @@ public class ModularTweaksModContainer extends DummyModContainer {
 		metadata.version = ModularTweaks.VERSION;
 		metadata.name = ModularTweaks.ID;
 		metadata.description = "";
-		proxy = FMLCommonHandler.instance().getSide().isClient() ? new ClientProxy() : new CommonProxy();
 	}
 
 	@Override
 	public boolean registerBus(EventBus bus, LoadController controller) {
+		proxy = FMLCommonHandler.instance().getSide().isClient() ? new ClientProxy() : new CommonProxy();
 		bus.register(this);
 		return true;
 	}
@@ -37,7 +37,7 @@ public class ModularTweaksModContainer extends DummyModContainer {
 	@Subscribe
 	public void preInit(FMLPreInitializationEvent event) {
 		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
-		ModularTweaks.loadConfigs(config);
+		ModularTweaks.instance.loadConfigs(config);
 	}
 	
 	@Subscribe
@@ -46,7 +46,7 @@ public class ModularTweaksModContainer extends DummyModContainer {
 		proxy.init();
 		ModularTweaks.logger.info("Done loading tweaks.");
 		try {
-			ASMifier.main(new String[]{"-debug", "tco.modulartweaks.TestModule"});
+			//ASMifier.main(new String[]{"-debug", "tco.modulartweaks.TestModule"});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

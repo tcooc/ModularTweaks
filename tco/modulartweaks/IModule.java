@@ -1,7 +1,5 @@
 package tco.modulartweaks;
 
-import org.objectweb.asm.tree.ClassNode;
-
 import net.minecraftforge.common.Configuration;
 
 //transform is always called (even if module is disabled)

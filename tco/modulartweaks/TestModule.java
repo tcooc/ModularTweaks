@@ -1,7 +1,5 @@
 package tco.modulartweaks;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
 import net.minecraft.world.World;
 
 

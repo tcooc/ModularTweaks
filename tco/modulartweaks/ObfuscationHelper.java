@@ -23,7 +23,7 @@ public class ObfuscationHelper {
 	static {
 		obf.put("canDropItself", "b");
 		obf.put("quantityDropped", "a");
-		obf.put("breakBlock", "b");
+		obf.put("breakBlock", "a");
 		obf.put("onEntityCollidedWithBlock", "a");
 		obf.put("net.minecraft.block.BlockGlass", "aki");
 		obf.put("net.minecraft.block.BlockCactus", "ajg");

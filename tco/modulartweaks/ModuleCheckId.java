@@ -51,6 +51,7 @@ public class ModuleCheckId implements IModule, ICrashCallable {
 		return "\n\n<ID Check>: Free block ids on crash: " + getAvailableIds() + "\n\n";
 	}
 	
+	@Override
 	public String getLabel() {
 		return ModularTweaks.ID;
 	}
