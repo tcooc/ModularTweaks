@@ -22,11 +22,14 @@ public class ModularTweaksTransformer implements IClassTransformer {
 
 	//iconst_0	03 : 0
 	//iconst_1	04 : 1
-	//iload	    15 : load integer onto stack(1)	
+	//iload	    15 : load integer onto stack (1)
+	//fload     17 : load float (1)
 	//aload     19 : load reference onto stack from local var (1)
+	//fmul      6a : multiply float
 	//ireturn	ac : return
 	//return	b1 : return
 	//getstatic	b2 : static reference (2)
+	//putfield  b5 : set field
 	//invokestatic	b8	:
 	//instanceof	c1 : instanceof (2)
 	//ifeq	99     : if== (2)
@@ -72,13 +75,13 @@ public class ModularTweaksTransformer implements IClassTransformer {
 		return null;
 	}
 
-	private void printMethod(MethodNode method) {
-		ModularTweaks.logger.info("Printing " + method.name + " " + method.desc);
+	public void printMethod(MethodNode method) {
+		ModularTweaks.logger.fine("Printing " + method.name + " " + method.desc);
 		for(int i = 0; i < method.instructions.size(); i++) {
-			ModularTweaks.logger.info(method.instructions.get(i).getType() +
+			ModularTweaks.logger.fine(method.instructions.get(i).getType() +
 					" " + Integer.toHexString(method.instructions.get(i).getOpcode()));
 		}
-		ModularTweaks.logger.info("---------------------------------------------");
+		ModularTweaks.logger.fine("---------------------------------------------");
 	}
 
 }

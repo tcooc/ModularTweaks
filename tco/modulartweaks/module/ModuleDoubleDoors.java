@@ -39,7 +39,7 @@ public class ModuleDoubleDoors implements IModule {
 	
 	@Override
 	public String getName() {
-		return "Double Doors";
+		return "DoubleDoors";
 	}
 	
 	@Override

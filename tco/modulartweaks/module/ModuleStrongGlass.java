@@ -3,7 +3,6 @@ package tco.modulartweaks.module;
 import java.lang.reflect.Method;
 import java.util.Random;
 
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
@@ -35,7 +34,7 @@ public class ModuleStrongGlass implements IModule {
 
 	@Override
 	public String getName() {
-		return "Strong Glass";
+		return "StrongGlass";
 	}
 
 	@Override
@@ -62,11 +61,11 @@ public class ModuleStrongGlass implements IModule {
 				trans.startTransform();
 				MethodNode method = trans.findMethod("quantityDropped", Type.getMethodDescriptor(Type.INT_TYPE, Type.getType(Random.class)));
 				InsnList insn = new InsnList();
-				insn.add(new VarInsnNode(Opcodes.ALOAD, 1));
-				Method reflMethod = ModuleStrongGlass.class.getDeclaredMethod("onGlassBreak", Random.class);
-				insn.add(new MethodInsnNode(Opcodes.INVOKESTATIC, ModuleStrongGlass.class.getCanonicalName().replaceAll("\\.", "/"),
+				insn.add(new VarInsnNode(ALOAD, 1));
+				Method reflMethod = getClass().getDeclaredMethod("onGlassBreak", Random.class);
+				insn.add(new MethodInsnNode(INVOKESTATIC, getClass().getCanonicalName().replaceAll("\\.", "/"),
 						reflMethod.getName(), Type.getMethodDescriptor(reflMethod)));
-				insn.add(new InsnNode(Opcodes.IRETURN));
+				insn.add(new InsnNode(IRETURN));
 				method.instructions = insn;
 				trans.stopTransform();
 			}

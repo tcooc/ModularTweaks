@@ -31,7 +31,7 @@ public class ModuleSignEdit implements IModule {
 
 	@Override
 	public String getName() {
-		return "Sign Edit";
+		return "SignEdit";
 	}
 
 	@Override

@@ -25,8 +25,13 @@ public class ObfuscationDecoder {
 		obf.put("quantityDropped", "a");
 		obf.put("breakBlock", "a");
 		obf.put("onEntityCollidedWithBlock", "a");
+		obf.put("doExplosionA", "N//A");
+		obf.put("doExplosionB", "N//A");
+		obf.put("canInteractWith", "B/a");
 		obf.put("net.minecraft.block.BlockGlass", "aki");
 		obf.put("net.minecraft.block.BlockCactus", "ajg");
 		obf.put("net.minecraft.block.BlockLog", "ana");
+		obf.put("net.minecraft.world.Explosion", "anfjlksfkdsal;dka;lsdk;akd;laskd;sk;sakdsl");
+		obf.put("net.minecraft.inventory.ContainerWorkbench", "workhello");
 	}
 }

@@ -1,6 +1,5 @@
 package tco.modulartweaks.module;
 
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.FieldInsnNode;
 import org.objectweb.asm.tree.InsnList;
@@ -54,12 +53,12 @@ public class ModuleCactusProof implements IModule {
 			InsnList insn = method.instructions;
 			InsnList insert = new InsnList();
 			LabelNode l1 = new LabelNode();
-			insert.add(new VarInsnNode(Opcodes.ALOAD, 5));
-			insert.add(new TypeInsnNode(Opcodes.INSTANCEOF, EntityItem.class.getCanonicalName().replaceAll("\\.", "/")));
-			insert.add(new JumpInsnNode(Opcodes.IFEQ, l1));
-			insert.add(new FieldInsnNode(Opcodes.GETSTATIC, ModuleCactusProof.class.getCanonicalName().replaceAll("\\.", "/"), "enabled", "Z"));
-			insert.add(new JumpInsnNode(Opcodes.IFEQ, l1));
-			insert.add(new InsnNode(Opcodes.RETURN));
+			insert.add(new VarInsnNode(ALOAD, 5));
+			insert.add(new TypeInsnNode(INSTANCEOF, EntityItem.class.getCanonicalName().replaceAll("\\.", "/")));
+			insert.add(new JumpInsnNode(IFEQ, l1));
+			insert.add(new FieldInsnNode(GETSTATIC, getClass().getCanonicalName().replaceAll("\\.", "/"), "enabled", "Z"));
+			insert.add(new JumpInsnNode(IFEQ, l1));
+			insert.add(new InsnNode(RETURN));
 			insert.add(l1);
 			//insert.add(new FrameNode());
 			//insert.add(new VarInsnNode(Opcodes.ALOAD, 5));

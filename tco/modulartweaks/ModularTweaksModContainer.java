@@ -44,7 +44,7 @@ public class ModularTweaksModContainer extends DummyModContainer {
 		proxy.init();
 		ModularTweaks.logger.info("Done loading tweaks.");
 		try {
-			//ASMifier.main(new String[]{"-debug", "tco.modulartweaks.TestModule"});
+			//org.objectweb.asm.util.ASMifier.main(new String[]{"-debug", "net.minecraft.world.Explosion"});
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

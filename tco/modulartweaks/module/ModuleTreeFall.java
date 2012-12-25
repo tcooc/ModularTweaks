@@ -3,7 +3,6 @@ package tco.modulartweaks.module;
 import java.lang.reflect.Method;
 import java.util.List;
 
-import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -18,9 +17,8 @@ import net.minecraft.entity.item.EntityItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
 import net.minecraftforge.common.Configuration;
-import net.minecraftforge.common.MinecraftForge;
 
-public class ModuleTreeGravity implements IModule {
+public class ModuleTreeFall implements IModule {
 
 	private static boolean disabled = true;
 
@@ -32,7 +30,7 @@ public class ModuleTreeGravity implements IModule {
 
 	@Override
 	public String getName() {
-		return "Tree Gravity";
+		return "TreeFall";
 	}
 
 	@Override
@@ -123,14 +121,14 @@ public class ModuleTreeGravity implements IModule {
 				 */
 				MethodNode method = trans.findMethod("breakBlock", Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(World.class), Type.INT_TYPE, Type.INT_TYPE, Type.INT_TYPE, Type.INT_TYPE, Type.INT_TYPE));
 				InsnList insn = new InsnList();
-				insn.add(new VarInsnNode(Opcodes.ALOAD, 1));
-				insn.add(new VarInsnNode(Opcodes.ILOAD, 2));
-				insn.add(new VarInsnNode(Opcodes.ILOAD, 3));
-				insn.add(new VarInsnNode(Opcodes.ILOAD, 4));
-				insn.add(new VarInsnNode(Opcodes.ILOAD, 5));
-				insn.add(new VarInsnNode(Opcodes.ILOAD, 6));
-				Method reflMethod = ModuleTreeGravity.class.getDeclaredMethod("onWoodBreak", World.class, Integer.TYPE, Integer.TYPE, Integer.TYPE, Integer.TYPE, Integer.TYPE);
-				insn.add(new MethodInsnNode(Opcodes.INVOKESTATIC, ModuleTreeGravity.class.getCanonicalName().replaceAll("\\.", "/"),
+				insn.add(new VarInsnNode(ALOAD, 1));
+				insn.add(new VarInsnNode(ILOAD, 2));
+				insn.add(new VarInsnNode(ILOAD, 3));
+				insn.add(new VarInsnNode(ILOAD, 4));
+				insn.add(new VarInsnNode(ILOAD, 5));
+				insn.add(new VarInsnNode(ILOAD, 6));
+				Method reflMethod = getClass().getDeclaredMethod("onWoodBreak", World.class, Integer.TYPE, Integer.TYPE, Integer.TYPE, Integer.TYPE, Integer.TYPE);
+				insn.add(new MethodInsnNode(INVOKESTATIC, getClass().getCanonicalName().replaceAll("\\.", "/"),
 						reflMethod.getName(), Type.getMethodDescriptor(reflMethod)));
 				method.instructions.insert(insn);
 				trans.stopTransform(); //*/

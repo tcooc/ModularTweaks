@@ -16,7 +16,7 @@ public class ModuleCheckId implements IModule, ICrashCallable {
 	
 	@Override
 	public String getName() {
-		return "ID Check";
+		return "IDCheck";
 	}
 
 	@Override
