@@ -10,6 +10,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import tco.modulartweaks.module.IModule;
+import tco.modulartweaks.module.ModuleAchievement;
 import tco.modulartweaks.module.ModuleCactusProof;
 import tco.modulartweaks.module.ModuleCheckId;
 import tco.modulartweaks.module.ModuleCrafting;
@@ -36,11 +37,12 @@ public class ModularTweaks implements IFMLLoadingPlugin, IFMLCallHook {
 	public static final String ID = "ModularTweaks";
 	public static final String VERSION = "1.0";
 
-	private static final boolean DEBUG = false;
+	static final boolean DEBUG = false;
 
 	public static ModularTweaks instance;
 	public static Logger logger;
-	
+
+	public final List<IModule> modules = new LinkedList<IModule>();
 	public final List<IModule> clientModules = new LinkedList<IModule>();
 	public final List<IModule> commonModules = new LinkedList<IModule>();
 
@@ -59,7 +61,7 @@ public class ModularTweaks implements IFMLLoadingPlugin, IFMLCallHook {
 					public String format(LogRecord record) {
 						if(record.getLevel().intValue() < Level.INFO.intValue()) {
 							return "[" + record.getLoggerName() + "] ["
-									 + record.getLevel() + "] " + record.getMessage() + "\n";
+									+ record.getLevel() + "] " + record.getMessage() + "\n";
 						}
 						return "";
 					}
@@ -72,22 +74,32 @@ public class ModularTweaks implements IFMLLoadingPlugin, IFMLCallHook {
 	}
 
 	public void initialize() {
-		clientModules.add(new ModuleDoubleDoors());
-		commonModules.add(new ModuleCactusProof());
-		commonModules.add(new ModuleCheckId());
-		commonModules.add(new ModuleStrongGlass());
-		commonModules.add(new ModuleTreeFall());
-		commonModules.add(new ModuleDeath());
-		commonModules.add(new ModuleSignEdit());
-		commonModules.add(new ModuleStack());
-		commonModules.add(new ModuleExplosion());
-		commonModules.add(new ModuleCrafting());
+		addModule(new ModuleDoubleDoors(), true);
+		addModule(new ModuleAchievement(), true);
+		addModule(new ModuleCactusProof(), false);
+		addModule(new ModuleCheckId(), false);
+		addModule(new ModuleStrongGlass(), false);
+		addModule(new ModuleTreeFall(), false);
+		addModule(new ModuleDeath(), false);
+		addModule(new ModuleSignEdit(), false);
+		addModule(new ModuleStack(), false);
+		addModule(new ModuleExplosion(), false);
+		addModule(new ModuleCrafting(), false);
+	}
+
+	public void addModule(IModule module, boolean client) {
+		modules.add(module);
+		if(client) {
+			clientModules.add(module);
+		} else {
+			commonModules.add(module);
+		}
 	}
 
 	public void loadConfigs(Configuration config) {
 		config.load();
 		List<IModule> toRemove = new LinkedList<IModule>();
-		for(IModule module : clientModules) {
+		for(IModule module : modules) {
 			boolean enabled = DEBUG || config.get("Modules", module.getName(), false, module.getDescription()).getBoolean(false);
 			if(enabled) {
 				module.loadConfigs(config);
@@ -95,16 +107,8 @@ public class ModularTweaks implements IFMLLoadingPlugin, IFMLCallHook {
 				toRemove.add(module);
 			}
 		}
+		modules.removeAll(toRemove);
 		clientModules.removeAll(toRemove);
-		toRemove.clear();
-		for(IModule module : commonModules) {
-			boolean enabled = DEBUG || config.get("Modules", module.getName(), false, module.getDescription()).getBoolean(false);
-			if(enabled) {
-				module.loadConfigs(config);
-			} else {
-				toRemove.add(module);
-			}
-		}
 		commonModules.removeAll(toRemove);
 		config.save();
 	}

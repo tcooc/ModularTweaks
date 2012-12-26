@@ -54,9 +54,9 @@ public class ModuleCactusProof implements IModule {
 			InsnList insert = new InsnList();
 			LabelNode l1 = new LabelNode();
 			insert.add(new VarInsnNode(ALOAD, 5));
-			insert.add(new TypeInsnNode(INSTANCEOF, EntityItem.class.getCanonicalName().replaceAll("\\.", "/")));
+			insert.add(new TypeInsnNode(INSTANCEOF, EntityItem.class.getCanonicalName().replace('.', '/')));
 			insert.add(new JumpInsnNode(IFEQ, l1));
-			insert.add(new FieldInsnNode(GETSTATIC, getClass().getCanonicalName().replaceAll("\\.", "/"), "enabled", "Z"));
+			insert.add(new FieldInsnNode(GETSTATIC, getClass().getCanonicalName().replace('.', '/'), "enabled", "Z"));
 			insert.add(new JumpInsnNode(IFEQ, l1));
 			insert.add(new InsnNode(RETURN));
 			insert.add(l1);

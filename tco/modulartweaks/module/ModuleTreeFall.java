@@ -128,7 +128,7 @@ public class ModuleTreeFall implements IModule {
 				insn.add(new VarInsnNode(ILOAD, 5));
 				insn.add(new VarInsnNode(ILOAD, 6));
 				Method reflMethod = getClass().getDeclaredMethod("onWoodBreak", World.class, Integer.TYPE, Integer.TYPE, Integer.TYPE, Integer.TYPE, Integer.TYPE);
-				insn.add(new MethodInsnNode(INVOKESTATIC, getClass().getCanonicalName().replaceAll("\\.", "/"),
+				insn.add(new MethodInsnNode(INVOKESTATIC, getClass().getCanonicalName().replace('.', '/'),
 						reflMethod.getName(), Type.getMethodDescriptor(reflMethod)));
 				method.instructions.insert(insn);
 				trans.stopTransform(); //*/

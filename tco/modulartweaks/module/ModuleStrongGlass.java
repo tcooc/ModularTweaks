@@ -28,7 +28,7 @@ public class ModuleStrongGlass implements IModule {
 		if(dropPane) {
 			ObfuscationReflectionHelper.setPrivateValue(
 					BlockPane.class, (BlockPane) Block.thinGlass, true,
-					"canDropItself", ObfuscationDecoder.get("canDropItself"));
+					"canDropItself", ObfuscationDecoder.getObf("canDropItself"));
 		}
 	}
 

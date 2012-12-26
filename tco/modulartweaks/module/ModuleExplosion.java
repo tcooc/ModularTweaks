@@ -84,7 +84,7 @@ public class ModuleExplosion implements IModule {
 				method.instructions.insert(l1);
 				method.instructions.insert(new InsnNode(RETURN));
 				method.instructions.insert(new JumpInsnNode(IFEQ, l1));
-				method.instructions.insert(new FieldInsnNode(GETSTATIC, getClass().getCanonicalName().replaceAll("\\.", "/"), "disableExplosions", "Z"));
+				method.instructions.insert(new FieldInsnNode(GETSTATIC, getClass().getCanonicalName().replace('.', '/'), "disableExplosions", "Z"));
 
 				//set node to correct one
 				node = method.instructions.getFirst();
@@ -99,7 +99,7 @@ public class ModuleExplosion implements IModule {
 				}
 				LabelNode l2 = new LabelNode();
 				method.instructions.insert(node, new JumpInsnNode(IFEQ, l2)); //right before node
-				method.instructions.insert(node, new FieldInsnNode(GETSTATIC, getClass().getCanonicalName().replaceAll("\\.", "/"), "doDamage", "Z")); //before node
+				method.instructions.insert(node, new FieldInsnNode(GETSTATIC, getClass().getCanonicalName().replace('.', '/'), "doDamage", "Z")); //before node
 				while(node.getOpcode() != INVOKEVIRTUAL) {
 					node = node.getNext();
 				}
@@ -118,7 +118,7 @@ public class ModuleExplosion implements IModule {
 				method.instructions.insert(l3);
 				method.instructions.insert(new InsnNode(RETURN));
 				method.instructions.insert(new JumpInsnNode(IFEQ, l3));
-				method.instructions.insert(new FieldInsnNode(GETSTATIC, getClass().getCanonicalName().replaceAll("\\.", "/"), "disableExplosions", "Z"));
+				method.instructions.insert(new FieldInsnNode(GETSTATIC, getClass().getCanonicalName().replace('.', '/'), "disableExplosions", "Z"));
 
 				node = method.instructions.getFirst();
 				AbstractInsnNode lastFloatLDC = null;
@@ -128,7 +128,7 @@ public class ModuleExplosion implements IModule {
 					}
 					node = node.getNext();
 				}
-				method.instructions.set(lastFloatLDC, new FieldInsnNode(GETSTATIC, getClass().getCanonicalName().replaceAll("\\.", "/"), "dropChance", "F"));
+				method.instructions.set(lastFloatLDC, new FieldInsnNode(GETSTATIC, getClass().getCanonicalName().replace('.', '/'), "dropChance", "F"));
 
 				trans.stopTransform(); //*/
 			}
