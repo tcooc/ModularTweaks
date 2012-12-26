@@ -1,4 +1,4 @@
-Builds: http://www.mediafire.com/#12cla35kaab1u
+Builds: http://www.mediafire.com/?12cla35kaab1u
 
 ### Usage ###
 Place jar file into the *coremods* folder.
