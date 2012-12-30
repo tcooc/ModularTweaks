@@ -1,7 +1,7 @@
 package tco.modulartweaks;
 
-import tco.modulartweaks.module.IModule;
 import net.minecraftforge.common.Configuration;
+import tco.modulartweaks.module.IModule;
 
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -23,7 +23,7 @@ public class ModularTweaksModContainer extends DummyModContainer {
 		metadata.modId = ModularTweaks.ID;
 		metadata.version = ModularTweaks.VERSION;
 		metadata.name = ModularTweaks.ID;
-		metadata.description = "";
+		metadata.description = "Vanilla gameplay changes.";
 	}
 
 	@Override
@@ -38,18 +38,22 @@ public class ModularTweaksModContainer extends DummyModContainer {
 
 	@Subscribe
 	public void preInit(FMLPreInitializationEvent event) {
-		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
-		ModularTweaks.instance.loadConfigs(config);
+		ModularTweaks.instance.configuration = new Configuration(event.getSuggestedConfigurationFile());
+		ModularTweaks.instance.loadConfigs();
 	}
 
 	@Subscribe
 	public void init(FMLInitializationEvent event) {
 		ModularTweaks.logger.info("Loading tweaks: ");
-		proxy.init();
+		try {
+			proxy.init();
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
 		ModularTweaks.logger.info("Done loading tweaks.");
 		if(ModularTweaks.DEBUG) {
 			try {
-				org.objectweb.asm.util.ASMifier.main(new String[]{"-debug", "net.minecraft.world.Explosion"});
+				//org.objectweb.asm.util.ASMifier.main(new String[]{"-debug", "net.minecraft.world.Explosion"});
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

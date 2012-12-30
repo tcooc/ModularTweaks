@@ -1,15 +1,23 @@
 package tco.modulartweaks.module;
 
-import tco.modulartweaks.ModularTweaksTransformer;
 import net.minecraft.block.Block;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntitySign;
-import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 
-public class ModuleSignEdit implements IModule {
+public class ModuleSignEdit extends ModuleImpl {
+
+	@Override
+	public String getDescription() {
+		return "Right click signs to edit";
+	}
+
+	@Override
+	public String getName() {
+		return "SignEdit";
+	}
 
 	@Override
 	public void initialize() {
@@ -27,24 +35,6 @@ public class ModuleSignEdit implements IModule {
 				}
 			}
 		}
-	}
-
-	@Override
-	public String getName() {
-		return "SignEdit";
-	}
-
-	@Override
-	public String getDescription() {
-		return "Right click signs to edit";
-	}
-
-	@Override
-	public void loadConfigs(Configuration config) {
-	}
-
-	@Override
-	public void transform(ModularTweaksTransformer transformer, String name) {
 	}
 
 }

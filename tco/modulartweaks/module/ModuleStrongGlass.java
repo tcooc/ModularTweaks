@@ -1,9 +1,16 @@
 package tco.modulartweaks.module;
 
-import java.lang.reflect.Method;
+import static org.objectweb.asm.Opcodes.ALOAD;
+import static org.objectweb.asm.Opcodes.INVOKESTATIC;
+import static org.objectweb.asm.Opcodes.IRETURN;
+
 import java.util.Random;
 
-import org.objectweb.asm.Type;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockPane;
+import net.minecraftforge.common.Property;
+import net.minecraftforge.common.Property.Type;
+
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.InsnNode;
 import org.objectweb.asm.tree.MethodInsnNode;
@@ -12,16 +19,26 @@ import org.objectweb.asm.tree.VarInsnNode;
 
 import tco.modulartweaks.ModularTweaksTransformer;
 import tco.modulartweaks.ObfuscationDecoder;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockPane;
-import net.minecraftforge.common.Configuration;
 import cpw.mods.fml.common.ObfuscationReflectionHelper;
 
-public class ModuleStrongGlass implements IModule {
+public class ModuleStrongGlass extends ModuleImpl {
 
-	private static boolean dropPane = true;
-	private static double glassDropChance = 1.0;
+	private static boolean dropPane = false;
+	private static double glassDropChance = 0.0;
+
+	public static int onGlassBreak(Random rand) {
+		return rand.nextDouble() < glassDropChance ? 1 : 0;
+	}
+
+	@Override
+	public String getDescription() {
+		return "Change glass and glas pane drop behaviour.";
+	}
+
+	@Override
+	public String getName() {
+		return "StrongGlass";
+	}
 
 	@Override
 	public void initialize() {
@@ -33,44 +50,39 @@ public class ModuleStrongGlass implements IModule {
 	}
 
 	@Override
-	public String getName() {
-		return "StrongGlass";
+	public Property[] getConfig() {
+		Property[] config = new Property[2];
+		config[0] = new Property("dropPane", String.valueOf(dropPane), Type.BOOLEAN);
+		config[0].comment = "Drop glass panes";
+		config[1] = new Property("glassDropChance", String.valueOf(glassDropChance), Type.DOUBLE);
+		config[1].comment = "Chance of dropping glass blocks, 1.0=100%, 0.0=0%";
+		return config;
 	}
 
 	@Override
-	public String getDescription() {
-		return "Change glass and glas pane drop behaviour.";
-	}
-
-	@Override
-	public void loadConfigs(Configuration config) {
-		dropPane = config.get(getName(), "dropPane", dropPane,
-				"Drop glass panes").getBoolean(dropPane);
-		glassDropChance = config.get(getName(), "glassDropChance", glassDropChance,
-				"Chance of dropping glass blocks, 1.0=100%, 0.0=0%").getDouble(glassDropChance);
-	}
-
-	public static int onGlassBreak(Random rand) {
-		return rand.nextDouble() < glassDropChance ? 1 : 0;
+	public boolean setConfig(String key, String value) {
+		if("dropPane".equals(key)) {
+			return true;
+		}
+		if("glassDropChance".equals(key)) {
+			return true;
+		}
+		return false;
 	}
 
 	@Override
 	public void transform(ModularTweaksTransformer trans, String name) {
-		try {
-			if(ObfuscationDecoder.checkBoth("net.minecraft.block.BlockGlass", name)) {
-				trans.startTransform();
-				MethodNode method = trans.findMethod("quantityDropped", Type.getMethodDescriptor(Type.INT_TYPE, Type.getType(Random.class)));
-				InsnList insn = new InsnList();
-				insn.add(new VarInsnNode(ALOAD, 1));
-				Method reflMethod = getClass().getDeclaredMethod("onGlassBreak", Random.class);
-				insn.add(new MethodInsnNode(INVOKESTATIC, getClass().getCanonicalName().replaceAll("\\.", "/"),
-						reflMethod.getName(), Type.getMethodDescriptor(reflMethod)));
-				insn.add(new InsnNode(IRETURN));
-				method.instructions = insn;
-				trans.stopTransform();
-			}
-		} catch(Exception e) {
-			e.printStackTrace();
+		if(ObfuscationDecoder.checkBoth("net.minecraft.block.BlockGlass", name)) {
+			trans.startTransform();
+			String signature = "(Ljava/util/Random;)I";
+			MethodNode method = trans.findMethod("quantityDropped", signature);
+			InsnList insn = new InsnList();
+			insn.add(new VarInsnNode(ALOAD, 1));
+			insn.add(new MethodInsnNode(INVOKESTATIC, getClass().getCanonicalName().replace('.', '/'),
+					"onGlassBreak", signature));
+			insn.add(new InsnNode(IRETURN));
+			method.instructions = insn;
+			trans.stopTransform();
 		}
 	}
 }

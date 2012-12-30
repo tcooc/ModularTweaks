@@ -5,28 +5,46 @@ import static net.minecraftforge.common.ForgeDirection.NORTH;
 import static net.minecraftforge.common.ForgeDirection.SOUTH;
 import static net.minecraftforge.common.ForgeDirection.UNKNOWN;
 import static net.minecraftforge.common.ForgeDirection.WEST;
-import tco.modulartweaks.ModularTweaksTransformer;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockDoor;
 import net.minecraft.block.BlockFenceGate;
 import net.minecraft.block.BlockTrapDoor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.Property;
+import net.minecraftforge.common.Property.Type;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import cpw.mods.fml.client.FMLClientHandler;
 
-public class ModuleDoubleDoors implements IModule {
+public class ModuleDoubleDoors extends ModuleImpl {
 	private static final ForgeDirection[] SIDES = { NORTH, EAST, SOUTH, WEST };
 	private BlockDoor door;
 	private BlockFenceGate gate;
 	private BlockTrapDoor trapdoor;
 	private boolean enableDoor = true, enableGate = true, enableTrapdoor = true;
-	
+
 	private Minecraft client;
+
+	private boolean doorOpen(World world, int x, int y, int z) {
+		return door.isDoorOpen(world, x, y, z);
+	}
+
+	private boolean gateOpen(World world, int x, int y, int z) {
+		return BlockFenceGate.isFenceGateOpen(world.getBlockMetadata(x, y, z));
+	}
+
+	@Override
+	public String getDescription() {
+		return "Client only; Opening 1 door opens adjacent doors. Also works for fence gates and trapdoors.";
+	}
+
+	@Override
+	public String getName() {
+		return "DoubleDoors";
+	}
 
 	@Override
 	public void initialize() {
@@ -36,25 +54,38 @@ public class ModuleDoubleDoors implements IModule {
 		client = FMLClientHandler.instance().getClient();
 		MinecraftForge.EVENT_BUS.register(this);
 	}
-	
-	@Override
-	public String getName() {
-		return "DoubleDoors";
-	}
-	
-	@Override
-	public String getDescription() {
-		return "Client only; Opening 1 door opens adjacent doors. Also works for fence gates and trapdoors.";
+
+	private boolean isBlock(PlayerInteractEvent e, ForgeDirection dir, Block block) {
+		return e.entity.worldObj.getBlockId(e.x + dir.offsetX, e.y + dir.offsetY, e.z + dir.offsetZ) == block.blockID;
 	}
 
 	@Override
-	public void loadConfigs(Configuration config) {
-			enableDoor = config.get(getName(), "enableDoor", enableDoor,
-				"Double doors").getBoolean(enableDoor);
-			enableGate = config.get(getName(), "enableGate", enableGate,
-				"Double gates").getBoolean(enableGate);
-			enableTrapdoor = config.get(getName(), "enableTrapdoor", enableTrapdoor,
-				"Double trapdoors").getBoolean(enableTrapdoor);
+	public Property[] getConfig() {
+		Property[] config = new Property[3];
+		config[0] = new Property("enableDoor", String.valueOf(enableDoor), Type.BOOLEAN);
+		config[0].comment = "Double doors";
+		config[1] = new Property("enableGate", String.valueOf(enableGate), Type.BOOLEAN);
+		config[1].comment = "Double gates";
+		config[2] = new Property("enableTrapdoor", String.valueOf(enableTrapdoor), Type.BOOLEAN);
+		config[2].comment = "Double trapdoors";
+		return config;
+	}
+
+	@Override
+	public boolean setConfig(String key, String value) {
+		if("enableDoor".equals(key)) {
+			enableDoor = Boolean.valueOf(value);
+			return true;
+		}
+		if("enableGate".equals(key)) {
+			enableGate = Boolean.valueOf(value);
+			return true;
+		}
+		if("enableTrapdoor".equals(key)) {
+			enableTrapdoor = Boolean.valueOf(value);
+			return true;
+		}
+		return false;
 	}
 
 	@ForgeSubscribe
@@ -93,32 +124,16 @@ public class ModuleDoubleDoors implements IModule {
 		}
 	}
 
+	private boolean trapdoorOpen(World world, int x, int y, int z) {
+		return BlockTrapDoor.isTrapdoorOpen(world.getBlockMetadata(x, y, z));
+	}
+
 	private void updateState(PlayerInteractEvent e, int x, int y, int z, boolean open, boolean isOpen) {
 		if(open != isOpen) {
 			client.playerController
 			.onPlayerRightClick(e.entityPlayer, e.entity.worldObj, e.entityPlayer.inventory.getCurrentItem(),
 					x, y, z, e.face, client.objectMouseOver.hitVec);
 		}
-	}
-
-	private boolean isBlock(PlayerInteractEvent e, ForgeDirection dir, Block block) {
-		return e.entity.worldObj.getBlockId(e.x + dir.offsetX, e.y + dir.offsetY, e.z + dir.offsetZ) == block.blockID;
-	}
-
-	private boolean doorOpen(World world, int x, int y, int z) {
-		return door.isDoorOpen(world, x, y, z);
-	}
-
-	private boolean gateOpen(World world, int x, int y, int z) {
-		return BlockFenceGate.isFenceGateOpen(world.getBlockMetadata(x, y, z));
-	}
-
-	private boolean trapdoorOpen(World world, int x, int y, int z) {
-		return BlockTrapDoor.isTrapdoorOpen(world.getBlockMetadata(x, y, z));
-	}
-
-	@Override
-	public void transform(ModularTweaksTransformer transformer, String name) {
 	}
 
 }

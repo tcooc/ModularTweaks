@@ -1,9 +1,16 @@
 package tco.modulartweaks.module;
 
-import java.lang.reflect.Method;
+import static org.objectweb.asm.Opcodes.ALOAD;
+import static org.objectweb.asm.Opcodes.ILOAD;
+import static org.objectweb.asm.Opcodes.INVOKESTATIC;
+
 import java.util.List;
 
-import org.objectweb.asm.Type;
+import net.minecraft.block.Block;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.world.World;
+
 import org.objectweb.asm.tree.InsnList;
 import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
@@ -12,34 +19,29 @@ import org.objectweb.asm.tree.VarInsnNode;
 import tco.modulartweaks.ModularTweaksTransformer;
 import tco.modulartweaks.ObfuscationDecoder;
 
-import net.minecraft.block.Block;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.world.World;
-import net.minecraftforge.common.Configuration;
-
-public class ModuleTreeFall implements IModule {
+public class ModuleTreeFall extends ModuleImpl {
 
 	private static boolean disabled = true;
 
-	@Override
-	public void initialize() {
-		//MinecraftForge.EVENT_BUS.register(this);
-		disabled = false;
+	private static int fillDepth = 19;
+
+	private static boolean working = false;
+
+	private static void breakBlock(World world, int x, int y, int z){
+		List<ItemStack> items = Block.blocksList[world.getBlockId(x, y, z)].getBlockDropped(world, x, y, z, world.getBlockMetadata(x, y, z), 0);
+		for (ItemStack item : items) {
+			float var = 0.7F;
+			double dx = world.rand.nextFloat() * var + (1.0F - var) * 0.5D;
+			double dy = world.rand.nextFloat() * var + (1.0F - var) * 0.5D;
+			double dz = world.rand.nextFloat() * var + (1.0F - var) * 0.5D;
+			EntityItem entityitem = new EntityItem(world, x + dx, y + dy, z + dz, item);
+			world.spawnEntityInWorld(entityitem);
+		}
+		world.setBlockWithNotify(x, y, z, 0);
 	}
 
-	@Override
-	public String getName() {
-		return "TreeFall";
-	}
-
-	@Override
-	public String getDescription() {
-		return "Trees fall.";
-	}
-
-	@Override
-	public void loadConfigs(Configuration config) {		
+	private static boolean isWood(World world, int x, int y, int z, int id) {
+		return world.getBlockId(x, y, z) == id;
 	}
 
 	public static void onWoodBreak(World world, int x, int y,
@@ -61,9 +63,6 @@ public class ModuleTreeFall implements IModule {
 			breakBlock(world, x, y + 1, z);
 		}
 	}
-
-	private static int fillDepth = 19;
-	private static boolean working = false;
 
 	/*public static void onWoodBreak2(World world, int x, int y,
 			int z, int par5, int par6) {
@@ -94,47 +93,43 @@ public class ModuleTreeFall implements IModule {
 		working = false;
 	}*/
 
-	private static void breakBlock(World world, int x, int y, int z){
-		List<ItemStack> items = Block.blocksList[world.getBlockId(x, y, z)].getBlockDropped(world, x, y, z, world.getBlockMetadata(x, y, z), 0);
-		for (ItemStack item : items) {
-			float var = 0.7F;
-			double dx = world.rand.nextFloat() * var + (1.0F - var) * 0.5D;
-			double dy = world.rand.nextFloat() * var + (1.0F - var) * 0.5D;
-			double dz = world.rand.nextFloat() * var + (1.0F - var) * 0.5D;
-			EntityItem entityitem = new EntityItem(world, x + dx, y + dy, z + dz, item);
-			world.spawnEntityInWorld(entityitem);
-		}
-		world.setBlockWithNotify(x, y, z, 0);
+	@Override
+	public String getDescription() {
+		return "Trees fall.";
 	}
 
-	private static boolean isWood(World world, int x, int y, int z, int id) {
-		return world.getBlockId(x, y, z) == id;
+	@Override
+	public String getName() {
+		return "TreeFall";
+	}
+
+	@Override
+	public void initialize() {
+		//MinecraftForge.EVENT_BUS.register(this);
+		disabled = false;
 	}
 
 	@Override
 	public void transform(ModularTweaksTransformer trans, String name) {
-		try{
-			if(ObfuscationDecoder.checkBoth("net.minecraft.block.BlockLog", name)) {
-				trans.startTransform();
-				/* Insert
-				 * ModuleTreeGravity.onWoodBreak(world, x, y, z, i ,m);
-				 */
-				MethodNode method = trans.findMethod("breakBlock", Type.getMethodDescriptor(Type.VOID_TYPE, Type.getType(World.class), Type.INT_TYPE, Type.INT_TYPE, Type.INT_TYPE, Type.INT_TYPE, Type.INT_TYPE));
-				InsnList insn = new InsnList();
-				insn.add(new VarInsnNode(ALOAD, 1));
-				insn.add(new VarInsnNode(ILOAD, 2));
-				insn.add(new VarInsnNode(ILOAD, 3));
-				insn.add(new VarInsnNode(ILOAD, 4));
-				insn.add(new VarInsnNode(ILOAD, 5));
-				insn.add(new VarInsnNode(ILOAD, 6));
-				Method reflMethod = getClass().getDeclaredMethod("onWoodBreak", World.class, Integer.TYPE, Integer.TYPE, Integer.TYPE, Integer.TYPE, Integer.TYPE);
-				insn.add(new MethodInsnNode(INVOKESTATIC, getClass().getCanonicalName().replace('.', '/'),
-						reflMethod.getName(), Type.getMethodDescriptor(reflMethod)));
-				method.instructions.insert(insn);
-				trans.stopTransform(); //*/
-			}
-		} catch(Exception e) {
-			e.printStackTrace();
+		if(ObfuscationDecoder.checkBoth("net.minecraft.block.BlockLog", name)) {
+			trans.startTransform();
+			/* Insert
+			 * ModuleTreeGravity.onWoodBreak(world, x, y, z, i ,m);
+			 */
+			String signature = "(L" +
+					ObfuscationDecoder.getCorrectDesc("net.minecraft.world.World") + ";IIIII)V";
+			MethodNode method = trans.findMethod("breakBlock", signature);
+			InsnList insn = new InsnList();
+			insn.add(new VarInsnNode(ALOAD, 1));
+			insn.add(new VarInsnNode(ILOAD, 2));
+			insn.add(new VarInsnNode(ILOAD, 3));
+			insn.add(new VarInsnNode(ILOAD, 4));
+			insn.add(new VarInsnNode(ILOAD, 5));
+			insn.add(new VarInsnNode(ILOAD, 6));
+			insn.add(new MethodInsnNode(INVOKESTATIC, getClass().getCanonicalName().replace('.', '/'),
+					"onWoodBreak", signature));
+			method.instructions.insert(insn);
+			trans.stopTransform(); //*/
 		}
 	}
 }

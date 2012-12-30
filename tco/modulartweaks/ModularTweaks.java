@@ -9,6 +9,8 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import net.minecraftforge.common.Configuration;
+import net.minecraftforge.common.Property;
 import tco.modulartweaks.module.IModule;
 import tco.modulartweaks.module.ModuleAchievement;
 import tco.modulartweaks.module.ModuleCactusProof;
@@ -16,31 +18,30 @@ import tco.modulartweaks.module.ModuleCheckId;
 import tco.modulartweaks.module.ModuleCrafting;
 import tco.modulartweaks.module.ModuleDeath;
 import tco.modulartweaks.module.ModuleDoubleDoors;
+import tco.modulartweaks.module.ModuleEntityLimit;
+import tco.modulartweaks.module.ModuleExplosion;
 import tco.modulartweaks.module.ModuleSignEdit;
 import tco.modulartweaks.module.ModuleStack;
 import tco.modulartweaks.module.ModuleStrongGlass;
 import tco.modulartweaks.module.ModuleTreeFall;
-import tco.modulartweaks.module.ModuleExplosion;
-
-import net.minecraftforge.common.Configuration;
-
+import tco.modulartweaks.module.mjirc.ModuleMJIrc;
 import cpw.mods.fml.common.FMLLog;
 import cpw.mods.fml.relauncher.IFMLCallHook;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin;
 import cpw.mods.fml.relauncher.IFMLLoadingPlugin.TransformerExclusions;
-
 //lava decay, infinite lava
-//3x3 crafting
 //double door rs
 @TransformerExclusions(value={"tco.modulartweaks"})
 public class ModularTweaks implements IFMLLoadingPlugin, IFMLCallHook {
 	public static final String ID = "ModularTweaks";
 	public static final String VERSION = "1.0";
 
-	static final boolean DEBUG = false;
+	static final boolean DEBUG = true;
 
 	public static ModularTweaks instance;
 	public static Logger logger;
+
+	public Configuration configuration;
 
 	public final List<IModule> modules = new LinkedList<IModule>();
 	public final List<IModule> clientModules = new LinkedList<IModule>();
@@ -76,6 +77,7 @@ public class ModularTweaks implements IFMLLoadingPlugin, IFMLCallHook {
 	public void initialize() {
 		addModule(new ModuleDoubleDoors(), true);
 		addModule(new ModuleAchievement(), true);
+		addModule(new ModuleMJIrc(), true);
 		addModule(new ModuleCactusProof(), false);
 		addModule(new ModuleCheckId(), false);
 		addModule(new ModuleStrongGlass(), false);
@@ -85,6 +87,7 @@ public class ModularTweaks implements IFMLLoadingPlugin, IFMLCallHook {
 		addModule(new ModuleStack(), false);
 		addModule(new ModuleExplosion(), false);
 		addModule(new ModuleCrafting(), false);
+		addModule(new ModuleEntityLimit(), false);
 	}
 
 	public void addModule(IModule module, boolean client) {
@@ -96,21 +99,32 @@ public class ModularTweaks implements IFMLLoadingPlugin, IFMLCallHook {
 		}
 	}
 
-	public void loadConfigs(Configuration config) {
-		config.load();
-		List<IModule> toRemove = new LinkedList<IModule>();
+
+	public void initializeActivatedModules(List<IModule> modules) {
 		for(IModule module : modules) {
-			boolean enabled = DEBUG || config.get("Modules", module.getName(), false, module.getDescription()).getBoolean(false);
-			if(enabled) {
-				module.loadConfigs(config);
-			} else {
-				toRemove.add(module);
+			if(DEBUG || configuration.get("Modules", module.getName(), false, module.getDescription()).getBoolean(false)) {
+				logger.info(module.getName());
+				module.initialize();
 			}
 		}
-		modules.removeAll(toRemove);
-		clientModules.removeAll(toRemove);
-		commonModules.removeAll(toRemove);
-		config.save();
+	}
+
+	public void loadConfigs() {
+		configuration.load();
+		for(IModule module : modules) {
+			boolean enabled = DEBUG || configuration.get("Modules", module.getName(), false, module.getDescription()).getBoolean(false);
+			Property[] props = module.getConfig();
+			for(int i = 0; i < props.length; i++) {
+				Property prop = props[i];
+				props[i] = configuration.get(module.getName(), prop.getName(), prop.value, prop.comment, prop.getType());
+			}
+			if(enabled) {
+				for(Property prop : props) {
+					module.setConfig(prop.getName(), prop.value);
+				}
+			}
+		}
+		configuration.save();
 	}
 
 	@Override

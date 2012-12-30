@@ -6,9 +6,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import cpw.mods.fml.common.IPlayerTracker;
-import cpw.mods.fml.common.registry.GameRegistry;
-import tco.modulartweaks.ModularTweaksTransformer;
 import net.minecraft.block.Block;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
@@ -17,14 +14,18 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityChest;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Configuration;
 import net.minecraftforge.common.ForgeDirection;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.Property;
+import net.minecraftforge.common.Property.Type;
 import net.minecraftforge.event.ForgeSubscribe;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.PlayerDropsEvent;
+import tco.modulartweaks.ModularTweaksTransformer;
+import cpw.mods.fml.common.IPlayerTracker;
+import cpw.mods.fml.common.registry.GameRegistry;
 
-public class ModuleDeath implements IModule, IPlayerTracker {
+public class ModuleDeath extends ModuleImpl implements IPlayerTracker {
 
 	private Map<String, Integer> expMap = new TreeMap<String, Integer>();
 	private Map<String, List<ItemStack>> itemMap = new TreeMap<String, List<ItemStack>>();
@@ -32,50 +33,6 @@ public class ModuleDeath implements IModule, IPlayerTracker {
 	private boolean keepExp = false,
 			keepInventory = false,
 			deathChest = true;
-
-	@Override
-	public void initialize() {
-		MinecraftForge.EVENT_BUS.register(this);
-		GameRegistry.registerPlayerTracker(this);
-	}
-
-	@ForgeSubscribe
-	public void onLivingDeath(LivingDeathEvent event) {
-		if(event.entityLiving instanceof EntityPlayer) {
-			EntityPlayer player = (EntityPlayer) event.entityLiving;
-			if(keepExp) {
-				expMap.put(player.username, player.experienceTotal);
-				player.experience = 0;
-				player.experienceLevel = 0;
-				player.experienceTotal = 0;
-			}
-		}
-	}
-
-	@ForgeSubscribe
-	public void playerDrops(PlayerDropsEvent event) {
-		if(keepInventory) {
-			List<ItemStack> list = new LinkedList<ItemStack>();
-			for(EntityItem e : event.drops) {
-				list.add(e.func_92014_d());
-			}
-			itemMap.put(event.entityPlayer.username, list);
-			event.drops.clear();
-		} else if(deathChest) {
-			fillChest(event.drops, event.entityPlayer);
-			fillChest(event.drops, event.entityPlayer);
-		}
-	}
-
-	private int getChest(ArrayList<EntityItem> list) {
-		for(int i = 0; i < list.size(); i++) {
-			ItemStack stack = list.get(i).func_92014_d();
-			if(stack != null && stack.itemID == Block.chest.blockID) {
-				return i;
-			}
-		}
-		return -1;
-	}
 
 	private void fillChest(ArrayList<EntityItem> list, EntityPlayer player) {
 		int chestIndex = getChest(list);
@@ -92,6 +49,32 @@ public class ModuleDeath implements IModule, IPlayerTracker {
 				}
 			}
 		}
+	}
+
+	private int getChest(ArrayList<EntityItem> list) {
+		for(int i = 0; i < list.size(); i++) {
+			ItemStack stack = list.get(i).func_92014_d();
+			if(stack != null && stack.itemID == Block.chest.blockID) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	@Override
+	public String getDescription() {
+		return "Player death tweaks";
+	}
+
+	@Override
+	public String getName() {
+		return "Death";
+	}
+
+	@Override
+	public void initialize() {
+		MinecraftForge.EVENT_BUS.register(this);
+		GameRegistry.registerPlayerTracker(this);
 	}
 
 	private boolean onItemUse(ArrayList<EntityItem> list, EntityPlayer player, ItemStack par1ItemStack, EntityPlayer par2EntityPlayer, World par3World, int par4, int par5, int par6, int par7)
@@ -182,31 +165,32 @@ public class ModuleDeath implements IModule, IPlayerTracker {
 		}
 	}
 
-	@Override
-	public String getName() {
-		return "Death";
+	@ForgeSubscribe
+	public void onLivingDeath(LivingDeathEvent event) {
+		if(event.entityLiving instanceof EntityPlayer) {
+			EntityPlayer player = (EntityPlayer) event.entityLiving;
+			if(keepExp) {
+				expMap.put(player.username, player.experienceTotal);
+				player.experience = 0;
+				player.experienceLevel = 0;
+				player.experienceTotal = 0;
+			}
+		}
 	}
 
 	@Override
-	public String getDescription() {
-		return "Player death tweaks";
+	public void onPlayerChangedDimension(EntityPlayer player) {
 	}
 
 	@Override
-	public void loadConfigs(Configuration config) {
-		keepExp = config.get(getName(), "keepExp", keepExp,
-				"Keep exp").getBoolean(keepExp);
-		keepInventory = config.get(getName(), "keepInventory", keepInventory,
-				"Keep inventory (not including hotbar)").getBoolean(keepInventory);
-		deathChest = config.get(getName(), "deathChest", deathChest,
-				"When a player with a chest dies, attempt placing dropped items in the chest which is left at the death point.").getBoolean(deathChest);	
-	}
-
-	@Override
-	public void transform(ModularTweaksTransformer transformer, String name) {
+	public void onPlayerLogin(EntityPlayer player) {
 	}
 
 	//IPlayerTracker
+
+	@Override
+	public void onPlayerLogout(EntityPlayer player) {
+	}
 
 	@Override
 	public void onPlayerRespawn(EntityPlayer player) {
@@ -224,16 +208,52 @@ public class ModuleDeath implements IModule, IPlayerTracker {
 		}
 	}
 
-	@Override
-	public void onPlayerLogin(EntityPlayer player) {
+	@ForgeSubscribe
+	public void playerDrops(PlayerDropsEvent event) {
+		if(keepInventory) {
+			List<ItemStack> list = new LinkedList<ItemStack>();
+			for(EntityItem e : event.drops) {
+				list.add(e.func_92014_d());
+			}
+			itemMap.put(event.entityPlayer.username, list);
+			event.drops.clear();
+		} else if(deathChest) {
+			fillChest(event.drops, event.entityPlayer);
+			fillChest(event.drops, event.entityPlayer);
+		}
 	}
 
 	@Override
-	public void onPlayerLogout(EntityPlayer player) {
+	public void transform(ModularTweaksTransformer transformer, String name) {
 	}
 
 	@Override
-	public void onPlayerChangedDimension(EntityPlayer player) {
+	public Property[] getConfig() {
+		Property[] config = new Property[3];
+		config[0] = new Property("keepExp", String.valueOf(keepExp), Type.BOOLEAN);
+		config[0].comment = "Keep exp";
+		config[1] = new Property("keepInventory", String.valueOf(keepInventory), Type.BOOLEAN);
+		config[1].comment = "Keep inventory (not including hotbar)";
+		config[2] = new Property("deathChest", String.valueOf(deathChest),Type.BOOLEAN);
+		config[2].comment = "When a player with a chest dies, attempt placing dropped items in the chest which is left at the death point.";
+		return config;
+	}
+
+	@Override
+	public boolean setConfig(String key, String value) {
+		if("keepExp".equals(key)) {
+			keepExp = Boolean.valueOf(value);
+			return true;
+		}
+		if("keepInventory".equals(key)) {
+			keepInventory = Boolean.valueOf(value);
+			return true;
+		}
+		if("deathChest".equals(key)) {
+			deathChest = Boolean.valueOf(value);
+			return true;
+		}
+		return false;
 	}
 
 }

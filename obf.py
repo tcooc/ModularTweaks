@@ -22,20 +22,17 @@ class UniqueMethod(object):
 
 def init(f, m, p):
 	"""Fills mappings files with proper data"""
-	fReader = open(f, "r")
-	lines = fReader.read().splitlines()
-	fReader.close()
+	with open(f, "r") as file:
+		lines = file.read().splitlines()
 	for line in lines:
 		splitLine = line.split(",")
 		fSrgToDeobf[splitLine[0]] = splitLine[1]
-	mReader = open(m, "r")
-	lines = mReader.read().splitlines()
-	mReader.close()
+	with open(m, "r") as file:
+		lines = file.read().splitlines()
 	for line in lines:
 		splitLine = line.split(",")
-	pReader = open(p, "r")
-	lines = pReader.read().splitlines()
-	pReader.close()
+	with open(p, "r") as file:
+		lines = file.read().splitlines()
 	for line in lines:
 		splitLine = line.split(" ")
 		if "CL:" == splitLine[0]:

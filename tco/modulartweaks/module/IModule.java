@@ -1,23 +1,51 @@
 package tco.modulartweaks.module;
 
-import org.objectweb.asm.Opcodes;
-
+import net.minecraftforge.common.Property;
 import tco.modulartweaks.ModularTweaksTransformer;
-import net.minecraftforge.common.Configuration;
 
-//loadConfigs and initialize are called (in that order) if the module is enabled
-//transform is always called (even if module is disabled)
-public interface IModule extends Opcodes {
-	
-	public void initialize();
-	//should return a string with no whitespace
-	public String getName();
-	//cannot return null
+/**
+ * A self-contained module that edits vanilla behaviour through base-edits,
+ * reflection, and hooks.
+ * 
+ * initialize is called if the module is enabled
+ * however, transform is always called since it occurs before classes are loaded
+ * 
+ * modules are always registered with the event bus (@Subscribe), but should only act if initialized
+ * 
+ * @author tcooc
+ *
+ */
+public interface IModule {
+
+	/**
+	 * returns an array of properties
+	 * with value=current value (default if initialize isn't called)
+	 */
+	public Property[] getConfig();
+
+	/**
+	 * @return non-null String
+	 */
 	public String getDescription();
 
-	//loadConfigs loads module specific configs (optional)
-	//use config.get(getName(), ... for better organization
-	public void loadConfigs(Configuration config);
+	/**
+	 * @return an unique String with no whitespace
+	 */
+	public String getName();
 
+	public void initialize();
+
+	/**
+	 * Return false if setting fails
+	 * @param key config name
+	 * @param value value to set to
+	 */
+	public boolean setConfig(String key, String value);
+
+	/**
+	 * Does bytecode transformations, if necessary.
+	 * @param name full name of the class being transformed
+	 * @see ModularTweaksTransformer
+	 */
 	public void transform(ModularTweaksTransformer transformer, String name);
 }

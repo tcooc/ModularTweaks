@@ -1,32 +1,11 @@
 package tco.modulartweaks.module;
 
-import tco.modulartweaks.ModularTweaks;
-import tco.modulartweaks.ModularTweaksTransformer;
 import net.minecraft.block.Block;
-import net.minecraftforge.common.Configuration;
+import tco.modulartweaks.ModularTweaks;
 import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.ICrashCallable;
 
-public class ModuleCheckId implements IModule, ICrashCallable {
-
-	@Override
-	public void initialize() {
-		FMLCommonHandler.instance().registerCrashCallable(this);		
-	}
-	
-	@Override
-	public String getName() {
-		return "IDCheck";
-	}
-
-	@Override
-	public String getDescription() {
-		return "Dumps available block ids on crash";
-	}
-
-	@Override
-	public void loadConfigs(Configuration config) {
-	}
+public class ModuleCheckId extends ModuleImpl implements ICrashCallable {
 
 	public static String getAvailableIds() {
 		int maxId = Block.blocksList.length;
@@ -52,13 +31,24 @@ public class ModuleCheckId implements IModule, ICrashCallable {
 	public String call() {
 		return "\n\n<ID Check>: Free block ids on crash: " + getAvailableIds() + "\n\n";
 	}
-	
+
+	@Override
+	public String getDescription() {
+		return "Dumps available block ids on crash";
+	}
+
 	@Override
 	public String getLabel() {
 		return ModularTweaks.ID;
 	}
 
 	@Override
-	public void transform(ModularTweaksTransformer transformer, String name) {
+	public String getName() {
+		return "IDCheck";
+	}
+
+	@Override
+	public void initialize() {
+		FMLCommonHandler.instance().registerCrashCallable(this);
 	}
 }

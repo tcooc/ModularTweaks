@@ -1,6 +1,7 @@
 package tco.modulartweaks;
 
 import java.util.List;
+
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.ClassNode;
@@ -9,13 +10,21 @@ import org.objectweb.asm.tree.MethodNode;
 import tco.modulartweaks.module.IModule;
 import cpw.mods.fml.relauncher.IClassTransformer;
 
+/**
+ * Class transformer
+ * Remember to call startTransform before using anyother methods in this class,
+ * and stopTransform when done transforming.
+ * @author tcooc
+ */
 public class ModularTweaksTransformer implements IClassTransformer {
 
 	private byte[] bytecode;
 	private ClassReader classReader;
-	private ClassWriter classWriter;
 	private ClassNode classNode;
 
+	/**
+	 * @return the ClassNode of the current class being transformed
+	 */
 	public ClassNode getClassNode() {
 		return classNode;
 	}
@@ -37,7 +46,6 @@ public class ModularTweaksTransformer implements IClassTransformer {
 	public byte[] transform(String name, byte[] bytes) {
 		if(name.startsWith("tco")) return bytes; //idk why this happens :/
 		bytecode = bytes;
-		classWriter = null;
 		try {
 			for(IModule module : ModularTweaks.instance.clientModules) {
 				module.transform(this, name);
@@ -49,23 +57,33 @@ public class ModularTweaksTransformer implements IClassTransformer {
 			e.printStackTrace();
 		}
 
-		if(classWriter != null) {
-			return classWriter.toByteArray();
-		}
-		return bytes;
+		return bytecode;
 	}
 
+	/**
+	 * Starts transformation. Call before any other method in this class.
+	 */
 	public void startTransform() {
 		classNode = new ClassNode();
 		classReader = new ClassReader(bytecode);
 		classReader.accept(classNode, 0);
 	}
 
+	/**
+	 * Call when done with transformations
+	 */
 	public void stopTransform() {
-		classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
+		ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS);
 		classNode.accept(classWriter);
+		bytecode = classWriter.toByteArray();
 	}
 
+	/**
+	 * Uses ObfuscationDecoder to find a method in the current class
+	 * @param name bane of method
+	 * @param desc signature of method
+	 * @return the corresponding MethodNode, or null if not found
+	 */
 	public MethodNode findMethod(String name, String desc) {
 		for(MethodNode method : (List<MethodNode>) classNode.methods) {
 			if(ObfuscationDecoder.checkBoth(name, method.name) && desc.equals(method.desc)) {
@@ -75,7 +93,7 @@ public class ModularTweaksTransformer implements IClassTransformer {
 		return null;
 	}
 
-	public void printMethod(MethodNode method) {
+	protected void printMethod(MethodNode method) {
 		ModularTweaks.logger.fine("Printing " + method.name + " " + method.desc);
 		for(int i = 0; i < method.instructions.size(); i++) {
 			ModularTweaks.logger.fine(method.instructions.get(i).getType() +
