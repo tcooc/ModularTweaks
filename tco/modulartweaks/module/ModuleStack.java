@@ -51,7 +51,7 @@ public class ModuleStack extends ModuleImpl {
 			prop.comment = Item.itemsList[id].getItemName();
 			config.add(prop);
 		}
-		return (Property[]) config.toArray();
+		return Arrays.copyOf(config.toArray(), config.size(), Property[].class);
 	}
 
 	@Override

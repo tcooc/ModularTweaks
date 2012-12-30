@@ -36,7 +36,7 @@ public class ModularTweaks implements IFMLLoadingPlugin, IFMLCallHook {
 	public static final String ID = "ModularTweaks";
 	public static final String VERSION = "1.0";
 
-	static final boolean DEBUG = true;
+	static final boolean DEBUG = false;
 
 	public static ModularTweaks instance;
 	public static Logger logger;
@@ -110,21 +110,25 @@ public class ModularTweaks implements IFMLLoadingPlugin, IFMLCallHook {
 	}
 
 	public void loadConfigs() {
-		configuration.load();
-		for(IModule module : modules) {
-			boolean enabled = DEBUG || configuration.get("Modules", module.getName(), false, module.getDescription()).getBoolean(false);
-			Property[] props = module.getConfig();
-			for(int i = 0; i < props.length; i++) {
-				Property prop = props[i];
-				props[i] = configuration.get(module.getName(), prop.getName(), prop.value, prop.comment, prop.getType());
-			}
-			if(enabled) {
-				for(Property prop : props) {
-					module.setConfig(prop.getName(), prop.value);
+		try {
+			configuration.load();
+			for(IModule module : modules) {
+				boolean enabled = DEBUG || configuration.get("Modules", module.getName(), false, module.getDescription()).getBoolean(false);
+				Property[] props = module.getConfig();
+				for(int i = 0; i < props.length; i++) {
+					Property prop = props[i];
+					props[i] = configuration.get(module.getName(), prop.getName(), prop.value, prop.comment, prop.getType());
 				}
+				if(enabled) {
+					for(Property prop : props) {
+						module.setConfig(prop.getName(), prop.value);
+					}
+				}
+				configuration.save();
 			}
+		} catch(Exception e) {
+			logger.log(Level.SEVERE, "Error loading logs", e);
 		}
-		configuration.save();
 	}
 
 	@Override

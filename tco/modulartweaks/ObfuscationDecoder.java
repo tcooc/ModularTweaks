@@ -8,8 +8,6 @@ import java.util.Map;
  * @author tcooc
  */
 public class ObfuscationDecoder {
-	public static boolean obfuscation = false;
-
 	private static final Map<String, String> obf = new HashMap<String, String>();
 
 	/**
@@ -34,7 +32,7 @@ public class ObfuscationDecoder {
 	 * @return correct name in current instance
 	 */
 	public static String getCorrect(String key) {
-		return obfuscation ? obf.get(key) : key;
+		return obfuscated() ? obf.get(key) : key;
 	}
 
 	/**
@@ -54,6 +52,10 @@ public class ObfuscationDecoder {
 		return key.equals(name) || obf.get(key).equals(name);
 	}
 
+	public static boolean obfuscated() {
+		return ClassLoader.getSystemResourceAsStream("net/minecraft/src/") == null;
+	}
+
 	protected static void dumpObfuscation() {
 		StringBuffer sb = new StringBuffer();
 		for(String key : obf.keySet()) {
@@ -70,11 +72,11 @@ public class ObfuscationDecoder {
 		put("guiAchievement", "u");
 		//######## methods ########
 		//net.minecraft.client.Minecraft.
-		put("handleClientCommand", "aasdeeeeeeeeeeeeeeefix meeeeeeeeeeeeeee");
+		put("handleClientCommand", "c");
 		//net.minecraft.block.BlockGlass.
 		put("quantityDropped", "a");
 		//net.minecraft.world.World.
-		put("spawnEntityInWorld", "feeeeeeeeeeeeeeeeeeeeeeeedmmmmmmmmmmmeeeeeeeeeeeeeeeeeeeeeee");
+		put("spawnEntityInWorld", "d");
 		//net.minecraft.block.BlockLog.
 		put("breakBlock", "a");
 		//net.minecraft.block.BlockCactus.
@@ -86,7 +88,7 @@ public class ObfuscationDecoder {
 		//net.minecraft.inventory.ContainerWorkbench.
 		put("canInteractWith", "a");
 		//######## classes ########
-		put("net.minecraft.client.Minecraft", "fixxxx meeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee");
+		put("net.minecraft.client.Minecraft", "net.minecraft.client.Minecraft");
 		put("net.minecraft.util.DamageSource", "lh");
 		put("net.minecraft.world.World", "yc");
 		put("net.minecraft.entity.Entity", "lq");
@@ -98,6 +100,6 @@ public class ObfuscationDecoder {
 		put("net.minecraft.world.Explosion", "xx");
 		put("net.minecraft.inventory.ContainerWorkbench", "rz");
 		put("net.minecraft.inventory.ContainerRepair", "sm");
-		put("net.minecraft.entity.item.EntityXPOrb", "umm, idk what the mappig for this is!!");
+		put("net.minecraft.entity.item.EntityXPOrb", "lz");
 	}
 }

@@ -1,6 +1,7 @@
 package tco.modulartweaks;
 
 import java.util.List;
+import java.util.logging.Level;
 
 import org.objectweb.asm.ClassReader;
 import org.objectweb.asm.ClassWriter;
@@ -54,7 +55,7 @@ public class ModularTweaksTransformer implements IClassTransformer {
 				module.transform(this, name);
 			}
 		} catch(Exception e) {
-			e.printStackTrace();
+			ModularTweaks.logger.log(Level.SEVERE, "Error with transformation", e);
 		}
 
 		return bytecode;
