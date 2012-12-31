@@ -22,7 +22,7 @@ public class ModularTweaksModContainer extends DummyModContainer {
 	public ModularTweaksModContainer() {
 		super(new ModMetadata());
 		ModMetadata metadata = getMetadata();
-		metadata.modId = ModularTweaks.ID;
+		metadata.modId = ModularTweaks.ID; // That's an amazing ID you have there.
 		metadata.version = ModularTweaks.VERSION;
 		metadata.name = ModularTweaks.ID;
 		metadata.description = "Vanilla gameplay changes.";
