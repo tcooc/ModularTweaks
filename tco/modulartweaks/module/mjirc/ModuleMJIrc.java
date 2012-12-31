@@ -15,7 +15,6 @@ import org.objectweb.asm.tree.MethodInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import org.objectweb.asm.tree.VarInsnNode;
 
-import tco.modulartweaks.ModularTweaks;
 import tco.modulartweaks.ModularTweaksTransformer;
 import tco.modulartweaks.ObfuscationDecoder;
 import tco.modulartweaks.module.ModuleImpl;
@@ -64,7 +63,6 @@ public class ModuleMJIrc extends ModuleImpl implements ITickHandler {
 		enabled = true;
 		instance = this;
 		manager = new MJIrcChatManager("irc");
-		ModularTweaks.logger.info(String.format("<<MJIRC>> %s %s %s", enabled, instance, manager));
 		TickRegistry.registerTickHandler(this, Side.CLIENT);
 	}
 

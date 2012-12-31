@@ -110,24 +110,29 @@ public class ModularTweaks implements IFMLLoadingPlugin, IFMLCallHook {
 	}
 
 	public void loadConfigs() {
-		try {
-			configuration.load();
-			for(IModule module : modules) {
-				boolean enabled = DEBUG || configuration.get("Modules", module.getName(), false, module.getDescription()).getBoolean(false);
-				Property[] props = module.getConfig();
-				for(int i = 0; i < props.length; i++) {
-					Property prop = props[i];
-					props[i] = configuration.get(module.getName(), prop.getName(), prop.value, prop.comment, prop.getType());
-				}
-				if(enabled) {
-					for(Property prop : props) {
-						module.setConfig(prop.getName(), prop.value);
-					}
-				}
-				configuration.save();
+		configuration.load();
+
+		if(configuration.get("Modules", "enableMassiveErrors", false, "WARNING: Set this to false or suffer unknown consequences!!").getBoolean(false)) {
+			try {
+				throw new RandomConfigErrorException();
+			} catch (RandomConfigErrorException e) {
+				e.printStackTrace();
 			}
-		} catch(Exception e) {
-			logger.log(Level.SEVERE, "Error loading logs", e);
+		}
+
+		for(IModule module : modules) {
+			boolean enabled = DEBUG || configuration.get("Modules", module.getName(), false, module.getDescription()).getBoolean(false);
+			Property[] props = module.getConfig();
+			for(int i = 0; i < props.length; i++) {
+				Property prop = props[i];
+				props[i] = configuration.get(module.getName(), prop.getName(), prop.value, prop.comment, prop.getType());
+			}
+			if(enabled) {
+				for(Property prop : props) {
+					module.setConfig(prop.getName(), prop.value);
+				}
+			}
+			configuration.save();
 		}
 	}
 

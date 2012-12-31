@@ -46,27 +46,34 @@ public class MJIrcChatManager {
 	public void handleCommand(String[] args) {
 		if (args.length > 0) {
 			if ("connect".equalsIgnoreCase(args[0])) {
-				String server = ModuleMJIrc.server;
-				int port = ModuleMJIrc.port;
+				String defaultServer = ModuleMJIrc.server;
+				int defaultPort = ModuleMJIrc.port;
 				if(args.length > 2) {
-					server = args[1];
+					defaultServer = args[1];
 				}
 				if(args.length > 3) {
 					try {
-						port = Integer.parseInt(args[2]);
+						defaultPort = Integer.parseInt(args[2]);
 					} catch(Exception e) {}
 				}
-				try {
-					if(connection != null) connection.disconnect();
-					connection = new MJIrcConnection(server, port);
-					connection.connect();
-					printChatMessage("[Irc] Connnecting to: " + server + ":" + port);
-				} catch (IOException e) {
-					printChatMessage("[Irc] Connection error: " + e.getMessage());
-					e.printStackTrace();
-				}
+				if(connection != null) connection.disconnect();
+				final String server = defaultServer;
+				final int port = defaultPort;
+				printChatMessage("[Irc] Connnecting to: " + defaultServer + ":" + defaultPort);
+				connection = new MJIrcConnection(server, port);
+				new Thread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							connection.connect();
+						} catch (IOException e) {
+							printChatMessage("[Irc] Connection error: " + e.getMessage());
+						}
+					}
+				}).start();
 			} else if ("disconnect".equalsIgnoreCase(args[0])) {
 				connection.disconnect();
+				printChatMessage("[Irc] Disconnected");
 			}
 			else if ("mode".equalsIgnoreCase(args[0])) {
 				if (args.length == 1) {
